@@ -563,7 +563,7 @@ class ReliefConnectRequestHandler(http.server.SimpleHTTPRequestHandler):
 
 def run_server(port: int = 8080):
     init_db(seed_sample_data=True)
-    server_address = ("127.0.0.1", port)
+    server_address = ("0.0.0.0", port)
     httpd = http.server.ThreadingHTTPServer(server_address, ReliefConnectRequestHandler)
     print(f"[ReliefConnect Server] Listening on http://localhost:{port}")
     try:
