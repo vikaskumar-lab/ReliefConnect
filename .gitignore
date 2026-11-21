@@ -1,5 +1,3 @@
 __pycache__/
-*.pyc
-*.db
-*.sqlite
-*.sqlite3
+*.py[cod]
+reliefconnect.db

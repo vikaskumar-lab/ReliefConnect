@@ -14,7 +14,12 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from backend.server import run_server
 
 if __name__ == "__main__":
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8080
+    # Hosting services (like Render) provide the port in the PORT variable
+    hosted = "PORT" in os.environ
+    if len(sys.argv) > 1:
+        port = int(sys.argv[1])
+    else:
+        port = int(os.environ.get("PORT", 8080))
     url = f"http://localhost:{port}"
 
     print("=" * 70)
@@ -28,9 +33,10 @@ if __name__ == "__main__":
     print("=" * 70)
     print("  Press Ctrl+C to stop server.\n")
 
-    try:
-        webbrowser.open(url)
-    except Exception:
-        pass
+    if not hosted:
+        try:
+            webbrowser.open(url)
+        except Exception:
+            pass
 
     run_server(port)

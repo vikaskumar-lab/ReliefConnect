@@ -66,11 +66,3 @@ reliefconnect/
 
 - **Emergency Notice Banner**: Persistent alert stating this is a training prototype and giving official emergency dispatch numbers (112 / 911).
 - **Location Privacy Masking**: Toggle available on citizen request form that applies a ~500m fuzzy perimeter to obfuscate exact household coordinates for vulnerable persons while preserving district-level triage accuracy.
-
-## ReliefConnect UI refresh (prototype milestone)
-
-The frontend now includes a redesigned navy/cyan visual theme and a sign-in-style demo entry screen. To preview it, start the existing Python server using the project's normal run command and open the local application in your browser.
-
-**Important authentication limitation:** the current sign-in screen is only a frontend demonstration gate. It accepts any non-empty email/password and stores the selected demo role in the browser session. It does not authenticate identities, enforce permissions, or protect API endpoints. Do not expose this prototype publicly or use it for real emergency operations. Production authentication must be implemented server-side (password hashing, sessions/JWT, role checks, CSRF protections, rate limiting and audit logging) before deployment.
-
-The existing backend, SQLite database, map, allocation workflow, and audit functionality have been retained in this milestone. React, FastAPI, PostgreSQL/PostGIS migration, real GPS tracking, feedback APIs, advanced search, notifications and fraud detection are not yet implemented; they are planned follow-up phases rather than completed features.

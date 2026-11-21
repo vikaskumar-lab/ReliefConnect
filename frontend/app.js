@@ -11,7 +11,6 @@ let cachedRequests = [];
 let cachedShelters = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-  setupDemoLogin();
   initMap();
   fetchDashboardStats();
   loadRequests();
@@ -807,39 +806,4 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
-}
-
-
-// FRONTEND DEMO ACCESS ONLY. Replace with server-side authentication before deployment.
-function setupDemoLogin() {
-  const form = document.getElementById("demo-login-form");
-  const screen = document.getElementById("login-screen");
-  if (!form || !screen) return;
-  const savedRole = sessionStorage.getItem("reliefconnect_demo_role");
-  if (savedRole) showDemoWorkspace(savedRole);
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const email = document.getElementById("login-email").value.trim();
-    const password = document.getElementById("login-password").value;
-    const error = document.getElementById("login-error");
-    if (!email || !password) { error.textContent = "Enter an email and password to continue."; return; }
-    const role = document.getElementById("login-role").value;
-    sessionStorage.setItem("reliefconnect_demo_role", role);
-    showDemoWorkspace(role);
-  });
-}
-
-function showDemoWorkspace(role) {
-  const screen = document.getElementById("login-screen");
-  if (screen) screen.classList.add("login-hidden");
-  const roleLabel = document.getElementById("active-role");
-  if (roleLabel) roleLabel.textContent = role + " · Demo";
-}
-
-function demoLogout() {
-  sessionStorage.removeItem("reliefconnect_demo_role");
-  const screen = document.getElementById("login-screen");
-  if (screen) screen.classList.remove("login-hidden");
-  const form = document.getElementById("demo-login-form");
-  if (form) form.reset();
 }

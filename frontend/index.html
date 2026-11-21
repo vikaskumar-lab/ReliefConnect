@@ -11,36 +11,6 @@
 </head>
 <body>
 
-  <!-- DEMO ACCESS GATE: frontend-only prototype, not production authentication -->
-  <section id="login-screen" class="login-screen" aria-label="ReliefConnect sign in">
-    <div class="login-visual">
-      <div class="login-brand"><span class="login-mark">R</span><span>ReliefConnect</span></div>
-      <div class="login-message">
-        <span class="eyebrow">EMERGENCY OPERATIONS PLATFORM</span>
-        <h1>Coordinate faster.<br><em>Respond smarter.</em></h1>
-        <p>A unified workspace for emergency requests, volunteers, shelters and response coordination.</p>
-      </div>
-      <div class="login-footnote">TRAINING PROTOTYPE · NOT AN OFFICIAL DISPATCH SERVICE</div>
-    </div>
-    <div class="login-panel">
-      <form id="demo-login-form" class="login-card">
-        <div class="login-kicker">WELCOME BACK</div>
-        <h2>Sign in to your workspace</h2>
-        <p class="login-subtitle">Use any email and password to preview this frontend prototype.</p>
-        <label for="login-email">Email address</label>
-        <input id="login-email" type="email" autocomplete="username" placeholder="name@example.com" required>
-        <label for="login-password">Password</label>
-        <input id="login-password" type="password" autocomplete="current-password" placeholder="Enter any password" required>
-        <label for="login-role">Workspace role</label>
-        <select id="login-role"><option>Administrator</option><option>Disaster Coordinator</option><option>Volunteer</option><option>Citizen</option></select>
-        <button class="login-submit" type="submit">Enter dashboard <span>→</span></button>
-        <div id="login-error" class="login-error" role="alert"></div>
-        <div class="demo-note"><strong>Prototype access</strong><br>This screen is a visual demo gate only. It does not authenticate users or protect APIs.</div>
-      </form>
-    </div>
-  </section>
-
-
   <!-- 1. MANDATORY SAFETY & ETHICS NOTICE BANNER -->
   <aside class="safety-banner" aria-label="Emergency Notice">
     <div style="display:flex; align-items:center; gap:8px;">
@@ -67,9 +37,7 @@
         <span class="pulse-dot"></span>
         <span id="incident-name-text">Active Flood Crisis: Loading...</span>
       </div>
-      <button class="btn btn-outline btn-sm" onclick="fetchDashboardStats()">↻ Refresh</button>
-      <span id="active-role" class="active-role">Demo workspace</span>
-      <button class="btn btn-outline btn-sm" onclick="demoLogout()">Sign out</button>
+      <button class="btn btn-outline btn-sm" onclick="fetchDashboardStats()">🔄 Refresh</button>
     </div>
   </header>
 
