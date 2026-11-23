@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in | ReliefConnect</title>
+  <link rel="stylesheet" href="login.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="brand-panel" aria-label="About ReliefConnect">
+      <div class="logo"><span class="logo-mark">🌊</span><span>ReliefConnect</span></div>
+      <h1>Coordinate flood relief faster and fairer.</h1>
+      <p class="tagline">Multi-criteria triage and spatial allocation that matches help requests to the nearest shelter, supplies and volunteers.</p>
+      <ul class="points">
+        <li><b>Priority scoring</b><span>Severity, vulnerability, water depth and waiting time.</span></li>
+        <li><b>No double allocation</b><span>Every shelter bed and supply is reserved atomically.</span></li>
+        <li><b>Full audit trail</b><span>Each decision is logged with its reasoning.</span></li>
+      </ul>
+    </section>
+
+    <section class="auth-panel">
+      <div class="card">
+        <div class="tabs" role="tablist">
+          <button class="tab active" id="tab-login" role="tab" aria-selected="true" aria-controls="login-form">Sign in</button>
+          <button class="tab" id="tab-register" role="tab" aria-selected="false" aria-controls="register-form">Create account</button>
+        </div>
+
+        <p class="error" id="error" role="alert" aria-live="assertive" hidden></p>
+
+        <form id="login-form" novalidate>
+          <div class="login-methods" role="tablist" aria-label="Sign-in method">
+            <button type="button" class="method active" id="method-password" aria-selected="true">Email & password</button>
+            <button type="button" class="method" id="method-phone" aria-selected="false">Phone & OTP</button>
+          </div>
+
+          <div id="password-login">
+          <label for="login-email">Email</label>
+          <input id="login-email" type="email" autocomplete="username" required placeholder="you@example.com">
+
+          <label for="login-password">Password</label>
+          <div class="pw">
+            <input id="login-password" type="password" autocomplete="current-password" required placeholder="Your password">
+            <button type="button" class="show" data-target="login-password">Show</button>
+          </div>
+          <button class="submit" type="submit">Sign in</button>
+          <button type="button" class="text-action" id="forgot-link">Forgot password?</button>
+          </div>
+
+          <div id="phone-login" hidden>
+            <label for="login-phone">Phone number</label>
+            <input id="login-phone" type="tel" autocomplete="tel" placeholder="+91 98765 43210">
+            <button type="button" class="secondary-submit" id="send-otp">Send demo OTP</button>
+            <label for="login-otp">One-time password</label>
+            <input id="login-otp" type="text" inputmode="numeric" maxlength="6" placeholder="6-digit code">
+            <button type="button" class="submit" id="otp-login">Sign in with OTP</button>
+          </div>
+          <p class="hint">Coordinator, shelter manager and admin accounts are created by the system administrator.</p>
+        </form>
+
+        <form id="register-form" novalidate hidden>
+          <fieldset class="roles">
+            <legend>I am a</legend>
+            <label class="role"><input type="radio" name="role" value="citizen" checked><span><b>Citizen</b><small>I need help or want to track my requests</small></span></label>
+            <label class="role"><input type="radio" name="role" value="volunteer"><span><b>Volunteer</b><small>I can help with rescue and relief</small></span></label>
+          </fieldset>
+
+          <label for="reg-name">Full name</label>
+          <input id="reg-name" type="text" autocomplete="name" required maxlength="80">
+
+          <div class="two">
+            <div>
+              <label for="reg-email">Email</label>
+              <input id="reg-email" type="email" autocomplete="email" required>
+            </div>
+            <div>
+              <label for="reg-phone">Phone</label>
+              <input id="reg-phone" type="tel" autocomplete="tel" required>
+            </div>
+          </div>
+
+          <label for="reg-password">Password <small>(at least 8 characters)</small></label>
+          <div class="pw">
+            <input id="reg-password" type="password" autocomplete="new-password" required minlength="8">
+            <button type="button" class="show" data-target="reg-password">Show</button>
+          </div>
+
+          <label for="reg-confirm">Confirm password</label>
+          <input id="reg-confirm" type="password" autocomplete="new-password" required>
+
+          <button class="submit" type="submit">Create account</button>
+        </form>
+
+        <form id="forgot-form" novalidate hidden>
+          <h2>Reset your password</h2>
+          <p class="hint">Enter your account email. In this demo, the reset code is generated locally and shown here.</p>
+          <label for="reset-email">Email</label>
+          <input id="reset-email" type="email" autocomplete="email" required>
+          <button type="button" class="secondary-submit" id="send-reset">Send reset code</button>
+          <label for="reset-code">Reset code</label>
+          <input id="reset-code" type="text" inputmode="numeric" maxlength="6">
+          <label for="reset-password">New password</label>
+          <input id="reset-password" type="password" minlength="8" autocomplete="new-password">
+          <button type="button" class="submit" id="reset-submit">Update password</button>
+          <button type="button" class="text-action" id="back-login">Back to sign in</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="notice">
+    <span><strong>TRAINING PROTOTYPE ONLY</strong>: not an official emergency dispatch service.</span>
+    <span>Real emergency? Dial <strong>112 / 911</strong></span>
+  </footer>
+
+  <script src="login.js"></script>
+</body>
+</html>
