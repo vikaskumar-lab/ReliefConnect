@@ -83,47 +83,175 @@
 
 
             <!-- ROLE -->
-            <label for="login-role">Workspace role</label>
+<!-- ROLE -->
+<label for="login-role">Workspace role</label>
 
-            <select id="login-role">
-                <option>Administrator</option>
-                <option>Disaster Coordinator</option>
-                <option>Volunteer</option>
-                <option>Citizen</option>
-            </select>
+<select id="login-role">
+    <option>Administrator</option>
+    <option>Disaster Coordinator</option>
+    <option>Volunteer</option>
+    <option>Citizen</option>
+</select>
 
+<!-- FORGOT PASSWORD -->
+<div class="forgot-password">
+    <a href="#" id="forgot-password-link">
+        Forgot Password?
+    </a>
+</div>
 
-            <!-- FORGOT PASSWORD -->
-            <div class="forgot-password">
-                <a href="#" id="forgot-password-link">
-                    Forgot Password?
-                </a>
-            </div>
+<!-- LOGIN BUTTON -->
+<button class="login-submit" type="submit">
+    Enter dashboard <span>→</span>
+</button>
 
+<!-- ERROR MESSAGE -->
+<div
+    id="login-error"
+    class="login-error"
+    role="alert"
+></div>
 
-            <!-- LOGIN BUTTON -->
-            <button class="login-submit" type="submit">
-                Enter dashboard <span>→</span>
-            </button>
+<!-- DEMO NOTICE -->
+<div class="demo-note">
+    <strong>Prototype access</strong><br>
 
+    This screen is a visual demo gate only.
+    It does not authenticate users or protect APIs.
+</div>
 
-            <!-- ERROR MESSAGE -->
-            <div
-                id="login-error"
-                class="login-error"
-                role="alert"
-            ></div>
+<!-- CREATE ACCOUNT LINK -->
+<div class="create-account-link">
+    <span>Don't have an account?</span>
+    <a href="#" id="create-account-link">Create Account</a>
+</div>
 
+</form>
 
-            <!-- DEMO NOTICE -->
-            <div class="demo-note">
-                <strong>Prototype access</strong><br>
+<!-- FORGOT PASSWORD PANEL -->
+<div id="reset-password-panel" class="login-card" hidden>
 
-                This screen is a visual demo gate only.
-                It does not authenticate users or protect APIs.
-            </div>
+    <h2>Reset your password</h2>
 
-        </form>
+    <p>
+        Enter your email address and we'll help you
+        reset your password.
+    </p>
+
+    <div class="login-field">
+        <label for="reset-password-email">Email address</label>
+
+        <input
+            type="email"
+            id="reset-password-email"
+            placeholder="name@example.com"
+            required
+        >
+    </div>
+
+    <button
+        type="button"
+        id="send-reset-link"
+        class="login-submit"
+    >
+        Send Reset Link
+        <span>→</span>
+    </button>
+
+    <p id="reset-password-message" role="status"></p>
+
+    <div class="forgot-password">
+        <a href="#" id="back-to-login">
+            ← Back to Login
+        </a>
+    </div>
+
+</div>
+
+<!-- CREATE ACCOUNT PANEL -->
+<div id="create-account-panel" class="login-card" hidden>
+
+    <h2>Create an account</h2>
+
+    <p>
+        Join ReliefConnect to coordinate emergency response activities.
+    </p>
+
+    <!-- FULL NAME -->
+    <div class="login-field">
+        <label for="register-name">Full name</label>
+
+        <input
+            type="text"
+            id="register-name"
+            placeholder="Enter your full name"
+        >
+    </div>
+
+    <!-- EMAIL -->
+    <div class="login-field">
+        <label for="register-email">Email address</label>
+
+        <input
+            type="email"
+            id="register-email"
+            placeholder="name@example.com"
+        >
+    </div>
+    <div class="login-field">
+    <label for="register-role">Register as</label>
+    <select id="register-role">
+        <option value="">Select your role</option>
+        <option value="Administrator">Administrator</option>
+        <option value="Disaster Coordinator">Disaster Coordinator</option>
+        <option value="Volunteer">Volunteer</option>
+        <option value="Citizen">Citizen</option>
+    </select>
+</div>
+
+    <!-- PASSWORD -->
+    <div class="login-field">
+        <label for="register-password">Password</label>
+
+        <input
+            type="password"
+            id="register-password"
+            placeholder="Create a password"
+        >
+    </div>
+
+    <!-- CONFIRM PASSWORD -->
+    <div class="login-field">
+        <label for="register-confirm-password">Confirm password</label>
+
+        <input
+            type="password"
+            id="register-confirm-password"
+            placeholder="Confirm your password"
+        >
+    </div>
+
+    <!-- CREATE ACCOUNT BUTTON -->
+    <button
+        type="button"
+        id="register-button"
+        class="login-submit"
+    >
+        Create Account
+        <span>→</span>
+    </button>
+
+    <!-- REGISTRATION MESSAGE -->
+    <p id="register-message" role="status"></p>
+
+    <!-- BACK TO LOGIN -->
+    <div class="forgot-password">
+        <a href="#" id="register-back-to-login">
+            ← Back to Login
+        </a>
+    </div>
+
+</div>
 
     </div>
 

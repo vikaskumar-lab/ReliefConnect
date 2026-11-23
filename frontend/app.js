@@ -812,42 +812,496 @@ function escapeHtml(str) {
 
 // FRONTEND DEMO ACCESS ONLY. Replace with server-side authentication before deployment.
 function setupDemoLogin() {
+
+    // HTML Elements
     const form = document.getElementById("demo-login-form");
-    const screen = document.getElementById("login-screen");
+    const loginScreen = document.getElementById("login-screen");
 
-    if (!form || !screen) return;
+    const resetPanel = document.getElementById("reset-password-panel");
+    const createAccountPanel = document.getElementById("create-account-panel");
 
-    // Forgot Password functionality
+    const loginError = document.getElementById("login-error");
+
+    const registerButton = document.getElementById("register-button");
+    const registerMessage = document.getElementById("register-message");
+
     const forgotPasswordLink = document.getElementById("forgot-password-link");
+    const sendResetButton = document.getElementById("send-reset-link");
+    const resetMessage = document.getElementById("reset-password-message");
 
-    if (forgotPasswordLink) {
-        forgotPasswordLink.addEventListener("click", (event) => {
-            event.preventDefault();
-            alert("Forgot Password functionality will be implemented here.");
-        });
+    const createAccountLink = document.getElementById("create-account-link");
+
+    const backToLogin = document.getElementById("back-to-login");
+    const registerBackToLogin = document.getElementById("register-back-to-login");
+
+    // Check whether required elements exist
+    if (!form || !loginScreen) {
+        return;
     }
 
-    const savedRole = sessionStorage.getItem("reliefconnect_demo_role");
+    // -----------------------------------------
+    // HELPER: SHOW LOGIN SCREEN
+    // -----------------------------------------
 
-    if (savedRole) showDemoWorkspace(savedRole);
+    function showLoginScreen() {
 
-    form.addEventListener("submit", (event) => {
+        form.hidden = false;
+
+        if (resetPanel) {
+            resetPanel.hidden = true;
+        }
+
+        if (createAccountPanel) {
+            createAccountPanel.hidden = true;
+        }
+
+        if (loginError) {
+            loginError.textContent = "";
+        }
+
+        if (registerMessage) {
+            registerMessage.textContent = "";
+        }
+
+        if (resetMessage) {
+            resetMessage.textContent = "";
+        }
+    }
+
+    // -----------------------------------------
+    // HELPER: SHOW CREATE ACCOUNT SCREEN
+    // -----------------------------------------
+
+    function showCreateAccountScreen() {
+
+        form.hidden = true;
+
+        if (resetPanel) {
+            resetPanel.hidden = true;
+        }
+
+        if (createAccountPanel) {
+            createAccountPanel.hidden = false;
+        }
+
+        if (registerMessage) {
+            registerMessage.textContent = "";
+        }
+
+        if (loginError) {
+            loginError.textContent = "";
+        }
+    }
+
+    // -----------------------------------------
+    // HELPER: SHOW FORGOT PASSWORD SCREEN
+    // -----------------------------------------
+
+    function showResetPasswordScreen() {
+
+        form.hidden = true;
+
+        if (createAccountPanel) {
+            createAccountPanel.hidden = true;
+        }
+
+        if (resetPanel) {
+            resetPanel.hidden = false;
+        }
+
+        if (resetMessage) {
+            resetMessage.textContent = "";
+        }
+    }
+
+    // -----------------------------------------
+    // CHECK EXISTING SESSION
+    // -----------------------------------------
+
+    const savedRole = sessionStorage.getItem(
+        "reliefconnect_demo_role"
+    );
+
+    if (savedRole) {
+        showDemoWorkspace(savedRole);
+    }
+
+    // -----------------------------------------
+    // LOGIN
+    // -----------------------------------------
+
+    form.addEventListener("submit", function (event) {
+
         event.preventDefault();
 
-        const email = document.getElementById("login-email").value.trim();
-        const password = document.getElementById("login-password").value;
-        const error = document.getElementById("login-error");
+        const email = document
+            .getElementById("login-email")
+            .value
+            .trim()
+            .toLowerCase();
 
+        const password = document
+            .getElementById("login-password")
+            .value;
+
+        if (loginError) {
+            loginError.textContent = "";
+        }
+
+        // Check empty fields
         if (!email || !password) {
-            error.textContent = "Enter an email and password to continue.";
+
+            loginError.textContent =
+                "Please enter your email and password.";
+
             return;
         }
 
-        const role = document.getElementById("login-role").value;
+        // Get registered users
+        const users = JSON.parse(
+            localStorage.getItem("reliefconnect_users") || "[]"
+        );
 
-        sessionStorage.setItem("reliefconnect_demo_role", role);
-        showDemoWorkspace(role);
+        // Find registered account
+        const user = users.find(function (account) {
+            return account.email === email;
+        });
+
+        // Account does not exist
+        if (!user) {
+
+            loginError.textContent =
+                "Account not found. Please create an account first.";
+
+            return;
+        }
+
+        // Password verification
+        if (user.password !== password) {
+
+            loginError.textContent =
+                "Incorrect password. Please try again.";
+
+            return;
+        }
+
+        // Successful login
+        loginError.textContent = "";
+
+        // Store authenticated demo session
+        sessionStorage.setItem(
+            "reliefconnect_demo_role",
+            user.role
+        );
+
+        sessionStorage.setItem(
+            "reliefconnect_demo_email",
+            user.email
+        );
+
+        sessionStorage.setItem(
+            "reliefconnect_demo_name",
+            user.name
+        );
+
+        // Open workspace according to REGISTERED ROLE
+        showDemoWorkspace(user.role);
+
     });
+
+    // -----------------------------------------
+    // CREATE ACCOUNT LINK
+    // -----------------------------------------
+
+    if (createAccountLink) {
+
+        createAccountLink.addEventListener("click", function (event) {
+
+            event.preventDefault();
+
+            showCreateAccountScreen();
+
+        });
+
+    }
+
+    // -----------------------------------------
+    // REGISTER NEW ACCOUNT
+    // -----------------------------------------
+
+    if (registerButton) {
+
+        registerButton.addEventListener("click", function () {
+
+            const name = document
+                .getElementById("register-name")
+                .value
+                .trim();
+
+            const email = document
+                .getElementById("register-email")
+                .value
+                .trim()
+                .toLowerCase();
+
+            const role = document
+                .getElementById("register-role")
+                .value;
+
+            const password = document
+                .getElementById("register-password")
+                .value;
+
+            const confirmPassword = document
+                .getElementById("register-confirm-password")
+                .value;
+
+            registerMessage.textContent = "";
+
+            // Validate name
+            if (!name) {
+
+                registerMessage.textContent =
+                    "Please enter your full name.";
+
+                return;
+            }
+
+            // Validate email
+            if (!email) {
+
+                registerMessage.textContent =
+                    "Please enter your email address.";
+
+                return;
+            }
+
+            const emailPattern =
+                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailPattern.test(email)) {
+
+                registerMessage.textContent =
+                    "Please enter a valid email address.";
+
+                return;
+            }
+
+            // Validate role
+            if (!role) {
+
+                registerMessage.textContent =
+                    "Please select your role.";
+
+                return;
+            }
+
+            // Validate password
+            if (!password) {
+
+                registerMessage.textContent =
+                    "Please enter a password.";
+
+                return;
+            }
+
+            if (password.length < 8) {
+
+                registerMessage.textContent =
+                    "Password must contain at least 8 characters.";
+
+                return;
+            }
+
+            // Confirm password
+            if (password !== confirmPassword) {
+
+                registerMessage.textContent =
+                    "Passwords do not match.";
+
+                return;
+            }
+
+            // Get existing users
+            const users = JSON.parse(
+                localStorage.getItem("reliefconnect_users") || "[]"
+            );
+
+            // Check duplicate email
+            const existingUser = users.find(function (user) {
+                return user.email === email;
+            });
+
+            if (existingUser) {
+
+                registerMessage.textContent =
+                    "This email is already registered. Please login.";
+
+                return;
+            }
+
+            // Create new account
+            const newUser = {
+
+                name: name,
+
+                email: email,
+
+                role: role,
+
+                password: password
+
+            };
+
+            // Save account
+            users.push(newUser);
+
+            localStorage.setItem(
+                "reliefconnect_users",
+                JSON.stringify(users)
+            );
+
+            // Registration success
+            registerMessage.textContent =
+                "Account created successfully! Please login.";
+
+            // Fill login email automatically
+            document.getElementById("login-email").value = email;
+
+            // Clear registration fields
+            document.getElementById("register-name").value = "";
+
+            document.getElementById("register-email").value = "";
+
+            document.getElementById("register-role").value = "";
+
+            document.getElementById("register-password").value = "";
+
+            document.getElementById("register-confirm-password").value = "";
+
+            // Return to login screen
+            setTimeout(function () {
+
+                showLoginScreen();
+
+                if (loginError) {
+                    loginError.textContent =
+                        "Account created successfully! Please login.";
+                }
+
+            }, 1500);
+
+        });
+
+    }
+
+    // -----------------------------------------
+    // FORGOT PASSWORD
+    // -----------------------------------------
+
+    if (forgotPasswordLink) {
+
+        forgotPasswordLink.addEventListener("click", function (event) {
+
+            event.preventDefault();
+
+            showResetPasswordScreen();
+
+        });
+
+    }
+
+    // -----------------------------------------
+    // SEND PASSWORD RESET REQUEST
+    // -----------------------------------------
+
+    if (sendResetButton) {
+
+        sendResetButton.addEventListener("click", function () {
+
+            const email = document
+                .getElementById("reset-password-email")
+                .value
+                .trim()
+                .toLowerCase();
+
+            resetMessage.textContent = "";
+
+            if (!email) {
+
+                resetMessage.textContent =
+                    "Please enter your email address.";
+
+                return;
+            }
+
+            const emailPattern =
+                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailPattern.test(email)) {
+
+                resetMessage.textContent =
+                    "Please enter a valid email address.";
+
+                return;
+            }
+
+            const users = JSON.parse(
+                localStorage.getItem("reliefconnect_users") || "[]"
+            );
+
+            const user = users.find(function (account) {
+                return account.email === email;
+            });
+
+            if (user) {
+
+                resetMessage.textContent =
+                    "Your account exists. Password reset requires backend email integration.";
+
+            } else {
+
+                resetMessage.textContent =
+                    "No registered account found with this email.";
+
+            }
+
+        });
+
+    }
+
+    // -----------------------------------------
+    // BACK TO LOGIN FROM FORGOT PASSWORD
+    // -----------------------------------------
+
+    if (backToLogin) {
+
+        backToLogin.addEventListener("click", function (event) {
+
+            event.preventDefault();
+
+            showLoginScreen();
+
+        });
+
+    }
+
+    // -----------------------------------------
+    // BACK TO LOGIN FROM REGISTER
+    // -----------------------------------------
+
+    if (registerBackToLogin) {
+
+        registerBackToLogin.addEventListener("click", function (event) {
+
+            event.preventDefault();
+
+            showLoginScreen();
+
+        });
+
+    }
+
 }
 
 function showDemoWorkspace(role) {
