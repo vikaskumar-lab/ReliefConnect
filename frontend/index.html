@@ -12,33 +12,122 @@
 <body>
 
   <!-- DEMO ACCESS GATE: frontend-only prototype, not production authentication -->
-  <section id="login-screen" class="login-screen" aria-label="ReliefConnect sign in">
+  <!-- DEMO ACCESS GATE -->
+<section id="login-screen" class="login-screen" aria-label="ReliefConnect sign in">
+
+    <!-- LEFT SIDE: BRANDING -->
     <div class="login-visual">
-      <div class="login-brand"><span class="login-mark">R</span><span>ReliefConnect</span></div>
-      <div class="login-message">
-        <span class="eyebrow">EMERGENCY OPERATIONS PLATFORM</span>
-        <h1>Coordinate faster.<br><em>Respond smarter.</em></h1>
-        <p>A unified workspace for emergency requests, volunteers, shelters and response coordination.</p>
-      </div>
-      <div class="login-footnote">TRAINING PROTOTYPE · NOT AN OFFICIAL DISPATCH SERVICE</div>
+
+        <div class="login-brand">
+            <span class="login-mark">R</span>
+            <span>ReliefConnect</span>
+        </div>
+
+        <div class="login-message">
+            <span class="eyebrow">EMERGENCY OPERATIONS PLATFORM</span>
+
+            <h1>
+                Coordinate faster.<br>
+                <em>Respond smarter.</em>
+            </h1>
+
+            <p>
+                A unified workspace for emergency requests, volunteers,
+                shelters and response coordination.
+            </p>
+        </div>
+
+        <div class="login-footnote">
+            TRAINING PROTOTYPE · NOT AN OFFICIAL DISPATCH SERVICE
+        </div>
+
     </div>
+
+
+    <!-- RIGHT SIDE: LOGIN FORM -->
     <div class="login-panel">
-      <form id="demo-login-form" class="login-card">
-        <div class="login-kicker">WELCOME BACK</div>
-        <h2>Sign in to your workspace</h2>
-        <p class="login-subtitle">Use any email and password to preview this frontend prototype.</p>
-        <label for="login-email">Email address</label>
-        <input id="login-email" type="email" autocomplete="username" placeholder="name@example.com" required>
-        <label for="login-password">Password</label>
-        <input id="login-password" type="password" autocomplete="current-password" placeholder="Enter any password" required>
-        <label for="login-role">Workspace role</label>
-        <select id="login-role"><option>Administrator</option><option>Disaster Coordinator</option><option>Volunteer</option><option>Citizen</option></select>
-        <button class="login-submit" type="submit">Enter dashboard <span>→</span></button>
-        <div id="login-error" class="login-error" role="alert"></div>
-        <div class="demo-note"><strong>Prototype access</strong><br>This screen is a visual demo gate only. It does not authenticate users or protect APIs.</div>
-      </form>
+
+        <form id="demo-login-form" class="login-card">
+
+            <div class="login-kicker">WELCOME BACK</div>
+
+            <h2>Sign in to your workspace</h2>
+
+            <p class="login-subtitle">
+                Use any email and password to preview this frontend prototype.
+            </p>
+
+
+            <!-- EMAIL -->
+            <label for="login-email">Email address</label>
+
+            <input
+                id="login-email"
+                type="email"
+                autocomplete="username"
+                placeholder="name@example.com"
+                required
+            >
+
+
+            <!-- PASSWORD -->
+            <label for="login-password">Password</label>
+
+            <input
+                id="login-password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Enter any password"
+                required
+            >
+
+
+            <!-- ROLE -->
+            <label for="login-role">Workspace role</label>
+
+            <select id="login-role">
+                <option>Administrator</option>
+                <option>Disaster Coordinator</option>
+                <option>Volunteer</option>
+                <option>Citizen</option>
+            </select>
+
+
+            <!-- FORGOT PASSWORD -->
+            <div class="forgot-password">
+                <a href="#" id="forgot-password-link">
+                    Forgot Password?
+                </a>
+            </div>
+
+
+            <!-- LOGIN BUTTON -->
+            <button class="login-submit" type="submit">
+                Enter dashboard <span>→</span>
+            </button>
+
+
+            <!-- ERROR MESSAGE -->
+            <div
+                id="login-error"
+                class="login-error"
+                role="alert"
+            ></div>
+
+
+            <!-- DEMO NOTICE -->
+            <div class="demo-note">
+                <strong>Prototype access</strong><br>
+
+                This screen is a visual demo gate only.
+                It does not authenticate users or protect APIs.
+            </div>
+
+        </form>
+
     </div>
-  </section>
+
+</section>
 
 
   <!-- 1. MANDATORY SAFETY & ETHICS NOTICE BANNER -->

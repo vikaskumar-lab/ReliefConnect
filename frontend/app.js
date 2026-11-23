@@ -812,21 +812,42 @@ function escapeHtml(str) {
 
 // FRONTEND DEMO ACCESS ONLY. Replace with server-side authentication before deployment.
 function setupDemoLogin() {
-  const form = document.getElementById("demo-login-form");
-  const screen = document.getElementById("login-screen");
-  if (!form || !screen) return;
-  const savedRole = sessionStorage.getItem("reliefconnect_demo_role");
-  if (savedRole) showDemoWorkspace(savedRole);
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const email = document.getElementById("login-email").value.trim();
-    const password = document.getElementById("login-password").value;
-    const error = document.getElementById("login-error");
-    if (!email || !password) { error.textContent = "Enter an email and password to continue."; return; }
-    const role = document.getElementById("login-role").value;
-    sessionStorage.setItem("reliefconnect_demo_role", role);
-    showDemoWorkspace(role);
-  });
+    const form = document.getElementById("demo-login-form");
+    const screen = document.getElementById("login-screen");
+
+    if (!form || !screen) return;
+
+    // Forgot Password functionality
+    const forgotPasswordLink = document.getElementById("forgot-password-link");
+
+    if (forgotPasswordLink) {
+        forgotPasswordLink.addEventListener("click", (event) => {
+            event.preventDefault();
+            alert("Forgot Password functionality will be implemented here.");
+        });
+    }
+
+    const savedRole = sessionStorage.getItem("reliefconnect_demo_role");
+
+    if (savedRole) showDemoWorkspace(savedRole);
+
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const email = document.getElementById("login-email").value.trim();
+        const password = document.getElementById("login-password").value;
+        const error = document.getElementById("login-error");
+
+        if (!email || !password) {
+            error.textContent = "Enter an email and password to continue.";
+            return;
+        }
+
+        const role = document.getElementById("login-role").value;
+
+        sessionStorage.setItem("reliefconnect_demo_role", role);
+        showDemoWorkspace(role);
+    });
 }
 
 function showDemoWorkspace(role) {

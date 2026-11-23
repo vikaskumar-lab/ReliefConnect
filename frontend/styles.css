@@ -612,3 +612,21 @@ th { color:#b7cbe0; }
 .demo-note strong { color:#f0c778; }
 .login-error { color:#ff9292; font-size:12px; margin-top:10px; }
 @media(max-width:800px) { .login-screen { grid-template-columns:1fr; overflow:auto; } .login-visual { min-height:260px; padding:25px; } .login-message { margin:45px 0 20px; } .login-message h1 { font-size:38px; } .login-footnote { display:none; } .login-panel { padding:20px; } .main-header { padding:14px; } .active-role { display:none; } .content-container { padding:12px; } .stats-strip { padding:12px; } }
+/* Forgot Password Link */
+.forgot-password {
+    display: flex;
+    justify-content: flex-end;
+    margin: 8px 0 14px;
+}
+
+.forgot-password a {
+    color: #35b9d6;
+    font-size: 13px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;
+    color: #72d9e9;
+}
