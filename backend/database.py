@@ -12,7 +12,10 @@ import time
 from typing import List, Dict, Any, Optional, Tuple
 from backend.models import haversine_distance
 
-DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "reliefconnect.db")
+DB_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)),
+    "reliefconnect_backup.db"
+)
 
 def get_connection() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_PATH, timeout=30.0)
