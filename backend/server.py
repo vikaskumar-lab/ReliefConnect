@@ -1,4 +1,4 @@
-"""
+﻿"""
 ReliefConnect REST API & Web Server
 Multi-threaded, robust HTTP server using Python standard library.
 Serves full REST endpoints for Citizens, Coordinators, Shelters, Volunteers, Simulation & Frontend.
@@ -15,6 +15,7 @@ import sqlite3
 from typing import Dict, Any, Optional
 
 from backend.database import get_connection, init_db, log_audit, seed_crisis_data, DB_PATH
+from backend import auth
 from backend.algorithm import AllocationEngine
 from backend.simulator import FloodSimulator
 from backend.models import haversine_distance
@@ -27,14 +28,29 @@ class ReliefConnectRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=FRONTEND_DIR, **kwargs)
 
-    def _send_json(self, data: Any, status: int = 200):
+    def _send_json(
+        self,
+        data: Any,
+        status: int = 200,
+        extra_headers: Optional[Dict[str, str]] = None
+    ):
         response_bytes = json.dumps(data, indent=2).encode("utf-8")
+
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(response_bytes)))
+
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+        self.send_header(
+            "Access-Control-Allow-Methods",
+            "GET, POST, PUT, DELETE, OPTIONS"
+        )
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
+
+        if extra_headers:
+            for header_name, header_value in extra_headers.items():
+                self.send_header(header_name, header_value)
+
         self.end_headers()
         self.wfile.write(response_bytes)
 
@@ -71,10 +87,15 @@ class ReliefConnectRequestHandler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
-        if path.startswith("/api/"):
-            self._handle_api_post(path)
+
+        if path.startswith("/api/auth/"):
+           self._handle_auth_post(path)
+
+        elif path.startswith("/api/"):
+           self._handle_api_post(path)
+
         else:
-            self._send_json({"error": "Not Found"}, 404)
+           self._send_json({"error": "Not Found"}, 404)
 
     def do_PUT(self):
         parsed = urllib.parse.urlparse(self.path)
@@ -83,11 +104,240 @@ class ReliefConnectRequestHandler(http.server.SimpleHTTPRequestHandler):
             self._handle_api_put(path)
         else:
             self._send_json({"error": "Not Found"}, 404)
+    
+    # =========================================================================
+    # AUTHENTICATION HANDLERS
+    # =========================================================================
+
+    def _handle_auth_post(self, path: str):
+        body = self._read_json_body()
+        conn = get_connection()
+
+        try:
+            # 1. User Registration
+            if path == "/api/auth/register":
+                full_name = str(body.get("full_name", "")).strip()
+                phone = str(body.get("phone", "")).strip()
+                email = str(body.get("email", "")).strip().lower()
+                password = body.get("password", "")
+                role = str(body.get("role", "")).strip().lower()
+
+                if not full_name or not phone or not email:
+                    self._send_json(
+                        {"error": "Name, phone and email are required."}, 400
+                    )
+                    return
+
+                if "@" not in email or "." not in email.split("@")[-1]:
+                    self._send_json({"error": "Enter a valid email address."}, 400)
+                    return
+
+                if not isinstance(password, str) or len(password) < auth.MIN_PASSWORD_LEN:
+                    self._send_json(
+                        {"error": "Password must contain at least 8 characters."}, 400
+                    )
+                    return
+
+                if role not in auth.PUBLIC_REGISTRATION_ROLES:
+                    self._send_json(
+                        {"error": "This role cannot be registered publicly."}, 403
+                    )
+                    return
+
+                existing = conn.execute(
+                    "SELECT id FROM users WHERE email = ?", (email,)
+                ).fetchone()
+
+                if existing:
+                    self._send_json({"error": "Email is already registered."}, 409)
+                    return
+
+                user_id = f"usr-{str(uuid.uuid4())[:8]}"
+                now = time.time()
+
+                # Staff accounts require Administrator approval.
+                is_active = 1 if role in (
+                    auth.CITIZEN, auth.VOLUNTEER
+                ) else 0
+
+                conn.execute("""
+                    INSERT INTO users (
+                        id, full_name, phone_number, email,
+                        role, is_active, created_at
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    user_id, full_name, phone, email,
+                    role, is_active, now
+                ))
+
+                auth.save_password(conn, user_id, password)
+
+                if role == auth.VOLUNTEER:
+                    conn.execute("""
+                        INSERT INTO volunteers (
+                            id, user_id, skills_json, location_id,
+                            status, emergency_contact, rating, created_at
+                        )
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        f"vol-{str(uuid.uuid4())[:8]}",
+                        user_id,
+                        json.dumps(["first_aid"]),
+                        None,
+                        "available",
+                        phone,
+                        5.0,
+                        now
+                    ))
+
+                conn.commit()
+
+                if not is_active:
+                    self._send_json({
+                        "status": "pending_approval",
+                        "message": "Registration successful. Wait for Administrator approval."
+                    }, 201)
+                    return
+
+                token = auth.create_session(conn, user_id)
+
+                self._send_json({
+                    "status": "registered",
+                    "message": "Account created successfully.",
+                    "user": {
+                        "id": user_id,
+                        "full_name": full_name,
+                        "email": email,
+                        "role": role
+                    }
+                }, 201, {
+                    "Set-Cookie": auth.session_cookie_header(token)
+                })
+                return
+
+            # 2. User Login
+            elif path == "/api/auth/login":
+                email = str(body.get("email", "")).strip().lower()
+                password = body.get("password", "")
+
+                if not email or not isinstance(password, str):
+                    self._send_json(
+                        {"error": "Email and password are required."}, 400
+                    )
+                    return
+
+                user = conn.execute("""
+                    SELECT users.id, users.full_name, users.email,
+                           users.role, users.is_active,
+                           credentials.password_hash
+                    FROM users
+                    LEFT JOIN credentials
+                        ON users.id = credentials.user_id
+                    WHERE users.email = ?
+                """, (email,)).fetchone()
+
+                if not user or not user["password_hash"]:
+                    self._send_json(
+                        {"error": "Invalid email or password."}, 401
+                    )
+                    return
+
+                if not auth.verify_password(
+                    password, user["password_hash"]
+                ):
+                    self._send_json(
+                        {"error": "Invalid email or password."}, 401
+                    )
+                    return
+
+                if not user["is_active"]:
+                    self._send_json({
+                        "error": "Your account is awaiting Administrator approval."
+                    }, 403)
+                    return
+
+                token = auth.create_session(conn, user["id"])
+
+                self._send_json({
+                    "status": "success",
+                    "message": "Login successful.",
+                    "user": {
+                        "id": user["id"],
+                        "full_name": user["full_name"],
+                        "email": user["email"],
+                        "role": user["role"]
+                    }
+                }, 200, {
+                    "Set-Cookie": auth.session_cookie_header(token)
+                })
+                return
+
+            # 3. User Logout
+            elif path == "/api/auth/logout":
+                cookie_header = self.headers.get("Cookie", "")
+                token = auth.get_token_from_cookie(cookie_header)
+
+                if token:
+                    auth.delete_session(conn, token)
+
+                self._send_json(
+                    {"status": "success", "message": "Logged out successfully."},
+                    200,
+                    {"Set-Cookie": auth.clear_session_cookie_header()}
+                )
+                return
+
+            else:
+                self._send_json({"error": "Authentication route not found."}, 404)
+
+        except sqlite3.IntegrityError:
+            conn.rollback()
+            self._send_json({"error": "Account already exists or registration data is invalid."}, 409)
+
+        except Exception:
+            conn.rollback()
+            self._send_json({"error": "Authentication request failed."}, 500)
+
+        finally:
+            conn.close()
+
 
     # =========================================================================
     # GET HANDLERS
     # =========================================================================
+    
     def _handle_api_get(self, path: str, query: Dict[str, list]):
+        # Check the current login session
+        if path == "/api/auth/me":
+            cookie_header = self.headers.get("Cookie", "")
+            token = auth.get_token_from_cookie(cookie_header)
+
+            if not token:
+                self._send_json({"error": "Not authenticated"}, 401)
+                return
+
+            conn = get_connection()
+            try:
+                user = auth.get_user_by_token(conn, token)
+
+                if not user:
+                    self._send_json({"error": "Session expired or invalid"}, 401)
+                    return
+
+                self._send_json({
+                    "status": "authenticated",
+                    "user": {
+                        "id": user["id"],
+                        "full_name": user["full_name"],
+                        "email": user["email"],
+                        "role": user["role"]
+                    }
+                })
+                return
+            finally:
+                conn.close()
+
         conn = get_connection()
         cur = conn.cursor()
         try:
@@ -563,6 +813,12 @@ class ReliefConnectRequestHandler(http.server.SimpleHTTPRequestHandler):
 
 def run_server(port: int = 8080):
     init_db(seed_sample_data=True)
+
+    conn = get_connection()
+    try:
+        auth.init_auth_tables(conn)
+    finally:
+        conn.close()
     server_address = ("0.0.0.0", port)
     httpd = http.server.ThreadingHTTPServer(server_address, ReliefConnectRequestHandler)
     print(f"[ReliefConnect Server] Listening on http://localhost:{port}")
